@@ -1,0 +1,15 @@
+stages:
+- name: Build
+  steps:
+  - publishImageConfig:
+      dockerfilePath: ./Dockerfile
+      buildContext: .
+      tag: krumware/covidsc-web:master
+timeout: 60
+notification:
+  recipients:
+  - recipient: '#covid-sc'
+    notifier: c-8nmz6:n-4wkxt
+  condition:
+  - Success
+  - Failed
