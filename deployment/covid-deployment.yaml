@@ -1,0 +1,95 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    cattle.io/creator: norman
+    app: covid-sc
+    workload.user.cattle.io/workloadselector: deployment-covid-covid-sc
+  name: covid-sc
+  namespace: covid
+spec:
+  progressDeadlineSeconds: 600
+  replicas: 1
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      workload.user.cattle.io/workloadselector: deployment-covid-covid-sc
+  strategy:
+    rollingUpdate:
+      maxSurge: 25%
+      maxUnavailable: 25%
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        field.cattle.io/ports: '[[{"containerPort":80,"dnsName":"covid-sc-","name":"80tcp00","protocol":"TCP","sourcePort":0}]]'
+      creationTimestamp: null
+      labels:
+        workload.user.cattle.io/workloadselector: deployment-covid-covid-sc
+    spec:
+      containers:
+      - env:
+        - name: PORT
+          value: "8000"
+        image: 127.0.0.1:34422/covidsc-web:master
+        imagePullPolicy: Always
+        name: covid-sc
+        ports:
+        - containerPort: 80
+          name: 80tcp00
+          protocol: TCP
+        resources: {}
+        securityContext:
+          capabilities: {}
+        terminationMessagePath: /dev/termination-log
+        terminationMessagePolicy: File
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      schedulerName: default-scheduler
+      securityContext: {}
+      terminationGracePeriodSeconds: 30
+---
+kind: Service
+apiVersion: v1
+metadata:
+  labels:
+    app: covid-sc
+  annotations:
+    field.cattle.io/targetWorkloadIds: '["deployment:covid:covid-sc"]'
+    field.cattle.io/ipAddresses: "null"
+    field.cattle.io/targetDnsRecordIds: "null"
+  name: covid-sc-service
+  namespace: covid
+spec:
+  type: ClusterIP
+  ports:
+  - name: default
+    port: 8000
+    protocol: TCP
+    targetPort: 8000
+  selector:
+    workloadID_ingress-covid-sc-dev-krum-io: "true"
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  labels:
+    app: covid-sc
+  name: ingress-covid-sc-dev-krum-io
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    field.cattle.io/targetWorkloadIds: '["deployment:covid:covid-sc"]'
+  namespace: covid
+spec:
+  rules:
+  - host: covid-sc.dev.krum.io
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: covid-sc-service
+            servicePort: 8000
+  tls:
+  - hosts:
+    - covid-sc.dev.krum.io
+    secretName: crt-covid-sc-dev-krum-io
