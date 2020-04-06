@@ -1,0 +1,16 @@
+stages:
+- name: Build
+  steps:
+  - publishImageConfig:
+      dockerfilePath: ./Dockerfile
+      buildContext: .
+      tag: covidsc-web:master
+      registry: 127.0.0.1:34422
+timeout: 60
+notification:
+  recipients:
+  - recipient: '#covid-sc'
+    notifier: c-8nmz6:n-4wkxt
+  condition:
+  - Success
+  - Failed
