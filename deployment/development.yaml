@@ -93,3 +93,27 @@ spec:
   - hosts:
     - covid-sc.dev.krum.io
     secretName: crt-covid-sc-dev-krum-io
+---
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  labels:
+    app: covid-sc
+  name: dev-covidsc-ingress
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-production
+    field.cattle.io/targetWorkloadIds: '["deployment:covid:covid-sc"]'
+  namespace: covid
+spec:
+  rules:
+  - host:  dev.covidsc.com
+    http:
+      paths:
+        - path: /
+          backend:
+            serviceName: covid-sc-service
+            servicePort: 8000
+  tls:
+  - hosts:
+    - dev.covidsc.com
+    secretName: dev-covid-sc-com-crt
