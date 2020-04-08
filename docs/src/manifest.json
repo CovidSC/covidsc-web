@@ -2,7 +2,7 @@
   "name" : "COVID SC",
   "short_name" : "COVID SC",
   "description" : "Information and resources about COVID for the State of South Carolina",
-  "start_url" : "index.html",
+  "start_url" : "/index.html",
   "display" : "standalone",
   "orientation" : "portrait",
   "lang" : "English",
