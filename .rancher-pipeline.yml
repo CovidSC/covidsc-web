@@ -6,10 +6,14 @@ stages:
       buildContext: .
       tag: covidsc-web:master
       registry: 127.0.0.1:34422
+- name: Deploy
+  steps:
+  - applyYamlConfig:
+      path: ./deployment/development.yaml
 timeout: 60
 notification:
   recipients:
-  - recipient: '#covid-sc'
+  - recipient: '#systems'
     notifier: c-8nmz6:n-4wkxt
   condition:
   - Success
