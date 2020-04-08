@@ -236,7 +236,9 @@ export class CovidScPageResources extends LitElement {
       <div style="min-height:calc( 100% );" class="layout vertical">
         <div class="nav-header layout horizontal start">
           <div>
-            <a href="/" class="buttonlink"><mwc-icon-button icon="arrow_back"></mwc-icon-button></a>
+            <a href="/" class="buttonlink"
+              ><mwc-icon-button icon="arrow_back" @click=${this.closeLandbot}></mwc-icon-button
+            ></a>
             <!-- Kelsey's alternative icon -->
             <!-- <mwc-icon-button>
               <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 24 24">
@@ -337,9 +339,77 @@ export class CovidScPageResources extends LitElement {
     `;
   }
 
+  closeLandbot() {
+    // let's disable the killing of the landbot in case someone wants to return to the window once opened
+    if (!this.landbotOpened) {
+      // if someone didn't open landbot, they probably don't want to see it in their way on the other pages
+      window.myLandbot.destroy();
+      delete window.myLandbot;
+    }
+  }
+
+  loadAndLaunchLandbot() {
+    if (typeof window.LandbotPopup === 'undefined') {
+      const script = document.createElement('script');
+      // <script src="https://static.landbot.io/umicore/UmiAccessPoint.js"></script>
+      // <script SameSite="None; Secure" src="https://static.landbot.io/landbot-widget/landbot-widget-1.0.0.js"></script>
+      script.src = `https://static.landbot.io/landbot-widget/landbot-widget-1.0.0.js`;
+      // script.async = true;
+      // eslint-disable-next-line func-names
+      script.onload = function() {
+        this.launchLandbot();
+      }.bind(this);
+      document.body.append(script);
+    } else {
+      this.launchLandbot();
+    }
+  }
+
+  launchLandbot() {
+    if (!window.myLandbot) {
+      // eslint-disable-next-line no-undef
+      window.myLandbot = new LandbotPopup({
+        index: 'https://landbot.io/u/H-425846-85U6RSZFC8RLG2G0/index.html',
+      });
+
+      // Show a proactive message on landbot load
+      window.myLandbot.on('landbot-load', () => {
+        window.myLandbot.sendProactive({
+          message: 'Let me help you find the resources you need.',
+          author: 'CovidSC HelpBot',
+          avatar:
+            'https://storage.googleapis.com/media.helloumi.com/105897/channels/5S3N8WZWXWDJ91NU6KEF6WG7W1YY0SU5.png',
+          extra: {
+            hide_textbox: true,
+          },
+        });
+      });
+
+      window.myLandbot.on('landbot-widget-open', () => {
+        this.landbotOpened = true;
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(position => {
+            const lat = position.coords.latitude;
+            const long = position.coords.longitude;
+            window.myLandbot.send('landbot-custom-data', {
+              latitude: lat,
+              longitude: long,
+            });
+            // console.log(position);
+          });
+        }
+      });
+    }
+  }
+
   firstUpdated() {
     // this.getData();
+    this.landbotOpened = false;
     this.counts = {};
+    // console.log("launch landbot");
+    // this needs to be moved into the resources page, likely using https://dev.landbot.io/docs/?content=guide_landbot_embed#frame
+    //  will it support shadowdom?
+    this.loadAndLaunchLandbot();
   }
 }
 
