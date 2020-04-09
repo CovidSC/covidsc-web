@@ -12,7 +12,7 @@ stages:
       image: node:latest
       shellScript: |-
         cd deployment
-        sed -i 's/BUILD_NUM/build${CICD_EXECUTION_SEQUENCE}/g' development.yaml
+        sed -i "s/BUILD_NUM/build${CICD_EXECUTION_SEQUENCE}/g" development.yaml
   - applyYamlConfig:
       path: ./deployment/development.yaml
   when:
@@ -25,9 +25,9 @@ stages:
       image: node:latest
       shellScript: |-
         cd deployment
-        sed -i 's/BRANCH/${CICD_GIT_BRANCH}/g' pr-dev-deployment.yaml
-        sed -i 's/BUILD_NUM/build${CICD_EXECUTION_SEQUENCE}/g' pr-dev-deployment.yaml
-        sed -i '/^ / s/_/-/' pr-dev-deployment.yaml
+        sed -i "s/BRANCH/${CICD_GIT_BRANCH}/g" pr-dev-deployment.yaml
+        sed -i "s/BUILD_NUM/build${CICD_EXECUTION_SEQUENCE}/g" pr-dev-deployment.yaml
+        sed -i "/^ / s/_/-/" pr-dev-deployment.yaml
   - applyYamlConfig:
       path: ./deployment/pr-dev-deployment.yaml
     when:
