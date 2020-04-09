@@ -30,6 +30,7 @@ export default [
           'CNAME',
           'favicon.png',
           'src/manifest.json',
+          'src/scripts/**/*.js',
         ],
         dest: 'docs',
         options: {
