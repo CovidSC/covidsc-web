@@ -21,9 +21,6 @@ spec:
     type: RollingUpdate
   template:
     metadata:
-      annotations:
-        field.cattle.io/ports: '[[{"containerPort":80,"dnsName":"covid-sc-","name":"80tcp00","protocol":"TCP","sourcePort":0}]]'
-      creationTimestamp: null
       labels:
         workload.user.cattle.io/workloadselector: deployment-covid-covid-sc
     spec:
@@ -35,8 +32,8 @@ spec:
         imagePullPolicy: Always
         name: covid-sc
         ports:
-        - containerPort: 80
-          name: 80tcp00
+        - containerPort: 8000
+          name: default
           protocol: TCP
         resources: {}
         securityContext:
@@ -58,8 +55,6 @@ metadata:
     app: covid-sc
   annotations:
     field.cattle.io/targetWorkloadIds: '["deployment:covid:covid-sc"]'
-    field.cattle.io/ipAddresses: "null"
-    field.cattle.io/targetDnsRecordIds: "null"
   name: covid-sc-service
   namespace: covid
 spec:
@@ -70,7 +65,7 @@ spec:
     protocol: TCP
     targetPort: 8000
   selector:
-    workloadID_ingress-covid-sc-dev-krum-io: "true"
+    workloadID_covid-sc-service: "true"
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
@@ -87,10 +82,10 @@ spec:
   - host: covid-sc.dev.krum.io
     http:
       paths:
-        - path: /
-          backend:
-            serviceName: covid-sc-service
-            servicePort: 8000
+      - backend:
+          serviceName: covid-sc-service
+          servicePort: 8000
+        path: /
   tls:
   - hosts:
     - covid-sc.dev.krum.io
@@ -108,13 +103,13 @@ metadata:
   namespace: covid
 spec:
   rules:
-  - host:  dev.covidsc.com
+  - host: dev.covidsc.com
     http:
       paths:
-        - path: /
-          backend:
-            serviceName: covid-sc-service
-            servicePort: 8000
+      - backend:
+          serviceName: covid-sc-service
+          servicePort: 8000
+        path: /
   tls:
   - hosts:
     - dev.covidsc.com
