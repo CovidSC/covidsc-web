@@ -405,7 +405,7 @@ export class CovidScPageResources extends LitElement {
   firstUpdated() {
     // this.getData();
     this.landbotOpened = false;
-    this.counts = {};
+
     // console.log("launch landbot");
     // this needs to be moved into the resources page, likely using https://dev.landbot.io/docs/?content=guide_landbot_embed#frame
     //  will it support shadowdom?
