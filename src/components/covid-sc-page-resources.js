@@ -1,13 +1,7 @@
 import { LitElement, html, css } from 'lit-element';
-
-// TODO: move these dependencies out of here
-// UNUSED // import { google } from '@google/maps';
-
-import './covid-sc-map.js';
 import '@material/mwc-button';
 import '@material/mwc-icon-button';
 import { IronFlex, IronFlexAlignment } from './flex-styles.js';
-import './covid-sc-data-card.js';
 
 export class CovidScPageResources extends LitElement {
   // eslint-disable-next-line no-useless-constructor
