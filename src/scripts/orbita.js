@@ -45,7 +45,6 @@
         )
           check = true;
       })(navigator.userAgent || navigator.vendor || window.opera);
-      console.log(`check:${check}`);
       return check;
     };
     self.initPlugin = function(options) {
@@ -59,7 +58,6 @@
       const { domId } = options;
       self.domId = domId;
       const { domObject } = options; // krumware
-      console.log("obj", domObject)
       self.domObject = domObject; // krumware
       self.options = options;
       options.domId = 'chatWindow';
@@ -120,7 +118,6 @@
         }
         self.appendStyle(iframeStyle);
       }
-      console.log("iframe", iframeId);
       const chatbotFrame = document.createElement('iframe');
       chatbotFrame.src = url;
       chatbotFrame.name = 'orbita-chat-iframe';
@@ -136,7 +133,6 @@
       window.addEventListener('message', onMesageReceive);
       self.generateStyle(options.width, options.height);
       self.domObject.classList.add('colapseorbita');
-      console.log(self.domObject);
       self.domObject.appendChild(chatbotFrame);
     };
     self.appendStyle = function(css){
@@ -146,8 +142,6 @@
         cssObj.styleSheet.cssText = css;
       else
         cssObj.appendChild(document.createTextNode(css));
-      console.log(css);
-      console.log(cssObj);
       document.getElementsByTagName("head")[0].appendChild(cssObj);
     }
     self.generateStyle = function(width, height) {
