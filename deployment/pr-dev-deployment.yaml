@@ -3,9 +3,9 @@ kind: Deployment
 metadata:
   labels:
     cattle.io/creator: norman
-    app: covid-sc
-    workload.user.cattle.io/workloadselector: deployment-covid-covid-sc
-  name: covid-sc
+    app: covid-sc-BRANCH
+    workload.user.cattle.io/workloadselector: deployment-covid-covid-sc-BRANCH
+  name: covid-sc-BRANCH
   namespace: covid
 spec:
   progressDeadlineSeconds: 600
@@ -13,7 +13,7 @@ spec:
   revisionHistoryLimit: 10
   selector:
     matchLabels:
-      workload.user.cattle.io/workloadselector: deployment-covid-covid-sc
+      workload.user.cattle.io/workloadselector: deployment-covid-covid-sc-BRANCH
   strategy:
     rollingUpdate:
       maxSurge: 25%
@@ -24,15 +24,15 @@ spec:
       annotations:
         buildnum: BUILD_NUM
       labels:
-        workload.user.cattle.io/workloadselector: deployment-covid-covid-sc
+        workload.user.cattle.io/workloadselector: deployment-covid-covid-sc-BRANCH
     spec:
       containers:
       - env:
         - name: PORT
           value: "8000"
-        image: 127.0.0.1:34422/covidsc-web:master
+        image: 127.0.0.1:34422/covidsc-web:BRANCH
         imagePullPolicy: Always
-        name: covid-sc
+        name: covid-sc-BRANCH
         ports:
         - containerPort: 8000
           name: default
@@ -54,10 +54,10 @@ kind: Service
 apiVersion: v1
 metadata:
   labels:
-    app: covid-sc
+    app: covid-sc-BRANCH
   annotations:
-    field.cattle.io/targetWorkloadIds: '["deployment:covid:covid-sc"]'
-  name: covid-sc-service
+    field.cattle.io/targetWorkloadIds: '["deployment:covid:covid-sc-BRANCH"]'
+  name: covid-sc-BRANCH-service
   namespace: covid
 spec:
   type: ClusterIP
@@ -67,52 +67,28 @@ spec:
     protocol: TCP
     targetPort: 8000
   selector:
-    workloadID_covid-sc-service: "true"
+    workloadID_covid-sc-BRANCH-service: "true"
 ---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   labels:
-    app: covid-sc
-  name: ingress-covid-sc-dev-krum-io
+    app: covid-sc-BRANCH
+  name: ingress-covid-sc-BRANCH-dev-krum-io
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-production
-    field.cattle.io/targetWorkloadIds: '["deployment:covid:covid-sc"]'
+    field.cattle.io/targetWorkloadIds: '["deployment:covid:covid-sc-BRANCH"]'
   namespace: covid
 spec:
   rules:
-  - host: covid-sc.dev.krum.io
+  - host: BRANCH.covid-sc.dev.krum.io
     http:
       paths:
       - backend:
-          serviceName: covid-sc-service
+          serviceName: covid-sc-BRANCH-service
           servicePort: 8000
         path: /
   tls:
   - hosts:
-    - covid-sc.dev.krum.io
-    secretName: crt-covid-sc-dev-krum-io
----
-apiVersion: extensions/v1beta1
-kind: Ingress
-metadata:
-  labels:
-    app: covid-sc
-  name: dev-covidsc-ingress
-  annotations:
-    cert-manager.io/cluster-issuer: letsencrypt-production
-    field.cattle.io/targetWorkloadIds: '["deployment:covid:covid-sc"]'
-  namespace: covid
-spec:
-  rules:
-  - host: dev.covidsc.com
-    http:
-      paths:
-      - backend:
-          serviceName: covid-sc-service
-          servicePort: 8000
-        path: /
-  tls:
-  - hosts:
-    - dev.covidsc.com
-    secretName: dev-covid-sc-com-crt
+    - BRANCH.covid-sc.dev.krum.io
+    secretName: crt-BRANCH-covid-sc-dev-krum-io
