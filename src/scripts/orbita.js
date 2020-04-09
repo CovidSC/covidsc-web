@@ -49,7 +49,6 @@
       return check;
     };
     self.initPlugin = function(options) {
-      console.log('ere');
       // self.optionValidator(options);
       let mobileBotUrl = options.mobileBotUrl || '';
       if (mobileBotUrl && mobileBotUrl.indexOf('://') === -1) {
@@ -60,6 +59,7 @@
       const { domId } = options;
       self.domId = domId;
       const { domObject } = options; // krumware
+      console.log("obj", domObject)
       self.domObject = domObject; // krumware
       self.options = options;
       options.domId = 'chatWindow';
@@ -81,7 +81,7 @@
           }\
           </style>\
         `;
-        $('body').append(iframeStyle);
+        // document.body.append(iframeStyle);
       } else if (options.theme && options.theme == 'sidebar') {
         iframeId = 'orbita-chat-iframe-sidebar';
       } else if (options.theme && options.theme == 'inline') {
@@ -89,17 +89,17 @@
         let iframeStyle;
         if (options.position && options.position == 'inline') {
           iframeStyle =
-            '\
-        <style>\
-          #chatWindow {\
-            height: 100%;\
-          }\
-          #orbita-chat-iframe-inline {\
-            height: 100%;\
-            width: 100%;\
-          }\
-        </style>\
-        ';
+            `
+        <style>
+          #chatWindow {
+            height: 100%;
+          }
+          #orbita-chat-iframe-inline {
+            height: 100%;
+            width: 100%;
+          }
+        </style>
+        `;
         } else if (options.position && options.position == 'absolute') {
           iframeStyle =
             '\
@@ -131,74 +131,84 @@
       console.log(self.domObject);
       self.domObject.appendChild(chatbotFrame);
     };
+    self.appendStyle = function(css){
+      cssObj = document.createElement('style');
+      cssObj.type = 'text/css';
+      if (cssObj.styleSheet)
+        cssObj.styleSheet.cssText = css;
+      else
+        cssObj.appendChild(document.createTextNode(css));
 
+      document.getElementsByTagName("head")[0].appendChild(cssObj);
+    }
     self.generateStyle = function(width, height) {
       const css = `<style type="text/css">\
-    #${self.domId}.colapseorbita iframe#orbita-chat-iframe {\
-      width: 100%;\
-      height: 94px;\
-      right: 10;\
-      left:0;\
-      margin-bottom: 10px;\
-    }\
-    #${self.domId}.openorbita iframe#orbita-chat-iframe {\
-      width: ${width}px;\
-      height: ${height}px;\
-      max-width: 100vw;\
-      max-height: 100vh;\
-      margin-bottom: 0px\
-    }\
-    iframe#orbita-chat-iframe {\
-      position: fixed;\
-      bottom: 0;\
-      right: 10px;\
-      width: auto;\
-      height: ${height}px;\
-      border: none;\
-      max-width: 100%;\
-      max-height: 100%;\
-      margin-bottom: 10px;\
-    }\
-    iframe#orbita-chat-iframe-sidebar {\
-      height: 99vh;\
-      position: fixed;\
-      right: 2px;\
-      border-width: 1px;\
-      z-index: 99999;\
-      top: 0;\
-    }\
-    #orbita-chat-iframe-inline {\
-        border: 0;\
-        border-radius: 20px;\
-        -webkit-box-shadow: 0px 0px 4px -1px rgba(0, 0, 0, 0.75);\
-        -moz-box-shadow: 0px 0px 4px -1px rgba(0, 0, 0, 0.75);\
-        box-shadow: 0px 0px 4px -1px rgba(0, 0, 0, 0.75);\
+      #${self.domId}.colapseorbita iframe#orbita-chat-iframe {\
+        width: 100%;\
+        height: 94px;\
+        right: 10;\
+        left:0;\
+        margin-bottom: 10px;\
       }\
-      @media only screen and (max-device-width: 480px) {\
-        #${self.domId}.openorbita{\
-          width: 100vw;\n\
-          height: 100vh;\n\
-          top:0;\
-          right:0;\
-        }\
-        #${self.domId}.openorbita iframe#orbita-chat-iframe {\
-          width: 100vw;\n\
-          height: 100vh;\n\
-          margin-bottom: 0px;\n\
-          position: fixed;\n\
-          right:0px;\
-          left:0px;\n\
-          bottom:0px;\n\
-          top:0px\n\
-        }\
+      #${self.domId}.openorbita iframe#orbita-chat-iframe {\
+        width: ${width}px;\
+        height: ${height}px;\
+        max-width: 100vw;\
+        max-height: 100vh;\
+        margin-bottom: 0px\
       }\
-  </style>\
-  `;
-      $('body').append(css);
+      iframe#orbita-chat-iframe {\
+        position: fixed;\
+        bottom: 0;\
+        right: 10px;\
+        width: auto;\
+        height: ${height}px;\
+        border: none;\
+        max-width: 100%;\
+        max-height: 100%;\
+        margin-bottom: 10px;\
+      }\
+      iframe#orbita-chat-iframe-sidebar {\
+        height: 99vh;\
+        position: fixed;\
+        right: 2px;\
+        border-width: 1px;\
+        z-index: 99999;\
+        top: 0;\
+      }\
+      #orbita-chat-iframe-inline {\
+          border: 0;\
+          border-radius: 20px;\
+          -webkit-box-shadow: 0px 0px 4px -1px rgba(0, 0, 0, 0.75);\
+          -moz-box-shadow: 0px 0px 4px -1px rgba(0, 0, 0, 0.75);\
+          box-shadow: 0px 0px 4px -1px rgba(0, 0, 0, 0.75);\
+        }\
+        @media only screen and (max-device-width: 480px) {\
+          #${self.domId}.openorbita{\
+            width: 100vw;\n\
+            height: 100vh;\n\
+            top:0;\
+            right:0;\
+          }\
+          #${self.domId}.openorbita iframe#orbita-chat-iframe {\
+            width: 100vw;\n\
+            height: 100vh;\n\
+            margin-bottom: 0px;\n\
+            position: fixed;\n\
+            right:0px;\
+            left:0px;\n\
+            bottom:0px;\n\
+            top:0px\n\
+          }\
+        }\
+      </style>\
+    `;
+        self.appendStyle(css);
+      // document.body.append(css);
     };
     return {
       initPlugin: self.initPlugin,
     };
   };
   window.OrbitaChatBotPlugin = orbitaChatBotPlugin();
-})(jQuery);
+})();
