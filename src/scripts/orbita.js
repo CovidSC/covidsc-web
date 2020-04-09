@@ -86,44 +86,52 @@
         iframeId = 'orbita-chat-iframe-sidebar';
       } else if (options.theme && options.theme == 'inline') {
         iframeId = `orbita-chat-iframe-${options.theme}`;
-        let iframeStyle;
+        var iframeStyle;
         if (options.position && options.position == 'inline') {
-          iframeStyle =
-            `
-        <style>
-          #chatWindow {
+          iframeStyle =`#chatWindow {
             height: 100%;
           }
           #orbita-chat-iframe-inline {
             height: 100%;
             width: 100%;
           }
-        </style>
         `;
         } else if (options.position && options.position == 'absolute') {
           iframeStyle =
-            '\
-        <style>\
-          #chatWindow {\
-            height: 100%;\
-          }\
-          #orbita-chat-iframe-inline {\
-            height: 461px;\
-            width: 460px;\
-            position: absolute;\
-          }\
-        </style>\
-        ';
+            `
+              #chatWindow {
+                height: 100%;
+              }
+              #orbita-chat-iframe-inline {
+                height: 461px;
+                width: 460px;
+                position: absolute;
+              }
+          `;
+        } else {
+          iframeStyle =`#chatWindow {
+            height: 100%;
+          }
+          #orbita-chat-iframe-inline {
+            height: 100%;
+            width: 100%;
+          }
+        `;
         }
-        $('body').append(iframeStyle);
+        self.appendStyle(iframeStyle);
       }
+      console.log("iframe", iframeId);
       const chatbotFrame = document.createElement('iframe');
       chatbotFrame.src = url;
       chatbotFrame.name = 'orbita-chat-iframe';
       chatbotFrame.allow = 'geolocation; microphone;';
-      chatbotFrame.width = width;
+      if(width) chatbotFrame.width = width;
+      // hack this, tired of fiddling
+      chatbotFrame.height = '100%';
+      chatbotFrame.id = iframeId;
       // var chatbotFrame = '<iframe id=\'' + iframeId + '\' name="orbita-chat-iframe" allow="geolocation; microphone;"   width="' + width + '"></iframe>';
-
+      chatbotFrame.classList.add("layout");
+      chatbotFrame.classList.add("flex");
       // $('#' + iframeId).attr('src', (url));
       window.addEventListener('message', onMesageReceive);
       self.generateStyle(options.width, options.height);
@@ -138,70 +146,70 @@
         cssObj.styleSheet.cssText = css;
       else
         cssObj.appendChild(document.createTextNode(css));
-
+      console.log(css);
+      console.log(cssObj);
       document.getElementsByTagName("head")[0].appendChild(cssObj);
     }
     self.generateStyle = function(width, height) {
-      const css = `<style type="text/css">\
-      #${self.domId}.colapseorbita iframe#orbita-chat-iframe {\
-        width: 100%;\
-        height: 94px;\
-        right: 10;\
-        left:0;\
-        margin-bottom: 10px;\
+      const css = `
+      #${self.domId}.colapseorbita iframe#orbita-chat-iframe {
+        width: 100%;
+        height: 94px;
+        right: 10;
+        left:0;
+        margin-bottom: 10px;
+      }
+      #${self.domId}.openorbita iframe#orbita-chat-iframe {
+        width: ${width}px;
+        height: ${height}px;
+        max-width: 100vw;
+        max-height: 100vh;
+        margin-bottom: 0px
+      }
+      iframe#orbita-chat-iframe {
+        position: fixed;
+        bottom: 0;
+        right: 10px;
+        width: auto;
+        height: ${height}px;
+        border: none;
+        max-width: 100%;
+        max-height: 100%;
+        margin-bottom: 10px;
+      }
+      iframe#orbita-chat-iframe-sidebar {
+        height: 99vh;
+        position: fixed;
+        right: 2px;
+        border-width: 1px;
+        z-index: 99999;
+        top: 0;
       }\
-      #${self.domId}.openorbita iframe#orbita-chat-iframe {\
-        width: ${width}px;\
-        height: ${height}px;\
-        max-width: 100vw;\
-        max-height: 100vh;\
-        margin-bottom: 0px\
-      }\
-      iframe#orbita-chat-iframe {\
-        position: fixed;\
-        bottom: 0;\
-        right: 10px;\
-        width: auto;\
-        height: ${height}px;\
-        border: none;\
-        max-width: 100%;\
-        max-height: 100%;\
-        margin-bottom: 10px;\
-      }\
-      iframe#orbita-chat-iframe-sidebar {\
-        height: 99vh;\
-        position: fixed;\
-        right: 2px;\
-        border-width: 1px;\
-        z-index: 99999;\
-        top: 0;\
-      }\
-      #orbita-chat-iframe-inline {\
-          border: 0;\
-          border-radius: 20px;\
-          -webkit-box-shadow: 0px 0px 4px -1px rgba(0, 0, 0, 0.75);\
-          -moz-box-shadow: 0px 0px 4px -1px rgba(0, 0, 0, 0.75);\
-          box-shadow: 0px 0px 4px -1px rgba(0, 0, 0, 0.75);\
-        }\
-        @media only screen and (max-device-width: 480px) {\
-          #${self.domId}.openorbita{\
-            width: 100vw;\n\
-            height: 100vh;\n\
-            top:0;\
-            right:0;\
-          }\
-          #${self.domId}.openorbita iframe#orbita-chat-iframe {\
-            width: 100vw;\n\
-            height: 100vh;\n\
-            margin-bottom: 0px;\n\
-            position: fixed;\n\
-            right:0px;\
-            left:0px;\n\
-            bottom:0px;\n\
-            top:0px\n\
-          }\
-        }\
-      </style>\
+      #orbita-chat-iframe-inline {
+          border: 0;
+          border-radius: 20px;
+          -webkit-box-shadow: 0px 0px 4px -1px rgba(0, 0, 0, 0.75);
+          -moz-box-shadow: 0px 0px 4px -1px rgba(0, 0, 0, 0.75);
+          box-shadow: 0px 0px 4px -1px rgba(0, 0, 0, 0.75);
+        }
+        @media only screen and (max-device-width: 480px) {
+          #${self.domId}.openorbita{
+            width: 100vw;
+            height: 100vh;
+            top:0;
+            right:0;
+          }
+          #${self.domId}.openorbita iframe#orbita-chat-iframe {
+            width: 100vw;
+            height: 100vh;
+            margin-bottom: 0px;
+            position: fixed;
+            right:0px;
+            left:0px;
+            bottom:0px;
+            top:0px
+          }
+        }
     `;
         self.appendStyle(css);
       // document.body.append(css);

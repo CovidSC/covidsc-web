@@ -227,37 +227,20 @@ export class CovidScPageSymptoms extends LitElement {
 
   render() {
     return html`
-      <div style="min-height:calc( 100% );" class="layout vertical">
+      <div style="min-height:calc( 100% - 41px );" class="layout vertical">
         <div class="nav-header layout horizontal start">
-        <div>
-            <a href="/" class="buttonlink"
-              ><mwc-icon-button icon="arrow_back" @click=${this.closeLandbot}></mwc-icon-button
-            ></a>
-            <!-- Kelsey's alternative icon -->
-            <!-- <mwc-icon-button>
-              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="24" height="24" viewBox="0 0 24 24">
-                  <defs>
-                      <path id="prefix__a" d="M15.433 7H4.142l2.979 3.137c.417.427.417 1.116 0 1.543-.417.426-1.091.426-1.508 0L1 6.775C.583 6.348.583 5.659 1 5.232L5.613.32c.417-.427 1.09-.427 1.508 0 .417.426.417 1.116 0 1.542L4.14 5h11.292c.572 0 1.068.5 1.067 1-.001.501-.479 1-1.067 1z"/>
-                  </defs>
-                  <g fill="none" fill-rule="evenodd" transform="translate(4 6)">
-                      <mask id="prefix__b" fill="#fff">
-                          <use xlink:href="#prefix__a"/>
-                      </mask>
-                      <g fill="#FFF" mask="url(#prefix__b)">
-                          <path d="M0 0H24V24H0z" transform="translate(-4 -6)"/>
-                      </g>
-                  </g>
-              </svg>
-            </mwc-icon-button> -->
+          <div>
+            <a href="/" class="buttonlink">
+              <mwc-icon-button icon="arrow_back" @click=${this.closeLandbot}></mwc-icon-button>
+            </a>
           </div>
           <div class="layout horizontal self-center">
-            Find Resources
+            Report your symptoms
           </div>
         </div>
-        <div class="layout flex" id="chatWindow"></div>
+        <div class="layout vertical flex" id="chatWindow"></div>
         </div>
-
-        <div class="footer layout vertical center-justified">
+        <div class="footer layout vertical center-justified" style="box-sizing:border-box;">
           <div>
             Powered by
             <a target="_blank" href="https://www.hank.ai/?referrer=covidsc" class="buttonlink"
@@ -300,11 +283,12 @@ export class CovidScPageSymptoms extends LitElement {
       domObject: chatWindow,
       launchWord: 'open',
       name: 'Orbita',
-      width: '520',
-      height: '780',
+      // width: '520',
+      // height: '780',
       serverUrl: `${chatLocation}/bot/hub/${endpointTag}`,
       appSettingURL: `${chatLocation}/bot/hub/settings${endpointTag}`,
-      theme: 'dock-float',
+      // theme: 'dock-float',
+      theme: 'inline',
       oauthserverUrl: chatLocation,
       settings: {
         header: {
@@ -334,12 +318,12 @@ export class CovidScPageSymptoms extends LitElement {
         botAvatarUrl: '/chatbot/v2/assets/orbita-icon.svg',
         animationAvatarImageUrl: '/chatbot/v2/assets/avatar_loading.gif',
         animationImageUrl: '/chatbot/v2/assets/msg_loading.gif',
-        theme: {
-          dockFloat: {
-            buttonSrc: 'https://assets-engage.orbita.cloud/img/chatbutton.png',
-            buttonTitle: 'Hi There!',
-          },
-        },
+        // theme: {
+        //   dockFloat: {
+        //     buttonSrc: 'https://assets-engage.orbita.cloud/img/chatbutton.png',
+        //     buttonTitle: 'Hi There!',
+        //   },
+        // },
       },
     };
 
