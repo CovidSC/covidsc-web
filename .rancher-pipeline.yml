@@ -11,9 +11,7 @@ stages:
   - applyYamlConfig:
       path: ./deployment/development.yaml
 timeout: 60
-branch:
-  include:
-  - master
+branch: {}
 notification:
   recipients:
   - recipient: '#systems'
