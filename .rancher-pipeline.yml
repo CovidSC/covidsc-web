@@ -4,7 +4,7 @@ stages:
   - publishImageConfig:
       dockerfilePath: ./Dockerfile
       buildContext: .
-      tag: covidsc-web:master
+      tag: covidsc-web:${CICD_GIT_BRANCH}
       registry: 127.0.0.1:34422
 - name: Deploy Master
   steps:
