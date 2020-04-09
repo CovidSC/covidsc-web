@@ -81,7 +81,7 @@ metadata:
   namespace: covid
 spec:
   rules:
-  - host: BRANCH.covid-sc-dev.krum.io
+  - host: BRANCH.covid-sc.dev.krum.io
     http:
       paths:
       - backend:
@@ -90,5 +90,5 @@ spec:
         path: /
   tls:
   - hosts:
-    - BRANCH.covid-sc-dev.krum.io
+    - BRANCH.covid-sc.dev.krum.io
     secretName: crt-BRANCH-covid-sc-dev-krum-io
