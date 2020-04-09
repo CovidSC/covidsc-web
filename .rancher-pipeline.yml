@@ -27,6 +27,11 @@ stages:
         cd deployment
         echo ${CICD_GIT_BRANCH}
         echo ${CICD_EXECUTION_SEQUENCE}
+        echo ${CICD_GIT_COMMIT}
+        echo ${CICD_GIT_REF}
+        echo ${CICD_GIT_TAG}
+        echo ${CICD_EVENT}
+        
         sed -i 's/BRANCH/${CICD_GIT_BRANCH}/g' pr-dev-deployment.yaml
         sed -i 's/BUILD_NUM/build${CICD_EXECUTION_SEQUENCE}/g' pr-dev-deployment.yaml
   - applyYamlConfig:
