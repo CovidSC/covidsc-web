@@ -21,6 +21,8 @@ spec:
     type: RollingUpdate
   template:
     metadata:
+      annotations:
+        buildnum: BUILD_NUM
       labels:
         workload.user.cattle.io/workloadselector: deployment-covid-covid-sc
     spec:

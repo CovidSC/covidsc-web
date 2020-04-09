@@ -90,5 +90,5 @@ spec:
         path: /
   tls:
   - hosts:
-    - covid-sc.dev.krum.io
-    secretName: crt-covid-sc-dev-krum-io
+    - BRANCH.covid-sc-dev.krum.io
+    secretName: crt-BRANCH-covid-sc-dev-krum-io
