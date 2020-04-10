@@ -484,7 +484,6 @@ export class CovidScPageHome extends LitElement {
       type: 'line',
       data: {
         datasets: [],
-        // labels: ['12/1', '12/2', '12/3', '12/4']
       },
       options: {
         tooltips: {
@@ -493,12 +492,6 @@ export class CovidScPageHome extends LitElement {
           display: true,
           callbacks: {
             title(tooltipItem) {
-              // console.log("printing tooltipitem[0]:");
-              // console.log(tooltipItem[0]);
-              // console.log("printing tooltipitem[0].label:");
-              // console.log();
-              // console.log("printing data:");
-              // console.log(data);
               const split = tooltipItem[0].label.split(',');
               return `${split[0]},${split[1]}`;
             },
@@ -522,7 +515,7 @@ export class CovidScPageHome extends LitElement {
             type: 'time',
             time: {
               unit: 'day',
-              // minUnit: 'day',
+              minUnit: 'day',
               round: 'day',
               distribution: 'series',
             },
