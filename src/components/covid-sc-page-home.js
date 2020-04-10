@@ -492,15 +492,15 @@ export class CovidScPageHome extends LitElement {
           enabled: true,
           display: true,
           callbacks: {
-            title(tooltipItem, data) {
-              console.log(tooltipItem);
-              console.log(data);
-              return 'example title???';
-            },
-            label(tooltipItem, data) {
-              console.log(tooltipItem);
-              console.log(data);
-              return 'example label??****';
+            title(tooltipItem) {
+              // console.log("printing tooltipitem[0]:");
+              // console.log(tooltipItem[0]);
+              // console.log("printing tooltipitem[0].label:");
+              // console.log();
+              // console.log("printing data:");
+              // console.log(data);
+              const split = tooltipItem[0].label.split(',');
+              return `${split[0]},${split[1]}`;
             },
           },
           backgroundColor: '#FFF',
