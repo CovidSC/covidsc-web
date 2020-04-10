@@ -479,7 +479,6 @@ export class CovidScPageHome extends LitElement {
     // var data2 = [100,200,100,200];
     // var data1 = [{x:new Date(),y:100},{x:new Date(),y:100},{x:new Date(),y:100},{x:new Date(),y:100}];
     // var data2 = [100,200,100,200];
-
     const ctx = this.shadowRoot.getElementById('chart');
     const config = {
       type: 'line',
@@ -488,6 +487,29 @@ export class CovidScPageHome extends LitElement {
         // labels: ['12/1', '12/2', '12/3', '12/4']
       },
       options: {
+        tooltips: {
+          enable: true,
+          enabled: true,
+          display: true,
+          callbacks: {
+            title(tooltipItem, data) {
+              console.log(tooltipItem);
+              console.log(data);
+              return 'example title???';
+            },
+            label(tooltipItem, data) {
+              console.log(tooltipItem);
+              console.log(data);
+              return 'example label??****';
+            },
+          },
+          backgroundColor: '#FFF',
+          titleFontSize: 16,
+          titleFontColor: '#0066ff',
+          bodyFontColor: '#000',
+          bodyFontSize: 14,
+          displayColors: false,
+        },
         legend: {
           display: false,
         },
