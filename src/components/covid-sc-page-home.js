@@ -8,7 +8,7 @@ import '@material/mwc-button';
 import '@material/mwc-select';
 import '@material/mwc-menu';
 import '@material/mwc-list/mwc-list-item';
-import Chart from 'chart.js';
+import Chart from '../scripts/chart.esm.js';
 // import 'luxon';
 import './chartjs-adapter-luxon.js';
 import { IronFlex, IronFlexAlignment } from './flex-styles.js';
