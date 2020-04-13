@@ -349,14 +349,14 @@ export class CovidScPageHome extends LitElement {
           </div>
           <div class="layout vertical data-table module-content">
             <mwc-select
-              hidden
-              style="display:none;"
+              style="margin: 5px 0; width 75%"
               id="countymenu"
               outlined
               value="York"
               label="County"
               @change=${this.changeSelectedCounty}
             >
+              ${this.getData()}
               ${this.countyList.map(
                 item => html`
                   <mwc-list-item value="${item}">${item}</mwc-list-item>
@@ -428,14 +428,14 @@ export class CovidScPageHome extends LitElement {
 
   // eslint-disable-next-line class-methods-use-this, no-unused-vars
   changeSelectedCounty(e) {
-    // console.log(e);
+    console.log(e);
     // change to e.target.selected
-    // this.selectedCounty = e.path[0].value;
-    // if (this.countyData && this.countyData[this.selectedCounty]) {
-    //   this.chartData.countyData = this.countyData[this.selectedCounty];
-    //   // console.log(this.selectedCounty,this.chartData.countyData);
-    //   this.updateChart();
-    // }
+    this.selectedCounty = e.path[0].value;
+    if (this.countyData && this.countyData[this.selectedCounty]) {
+      this.chartData.countyData = this.countyData[this.selectedCounty];
+      console.log(this.selectedCounty, this.chartData.countyData);
+      this.updateChart();
+    }
   }
 
   updateChart() {
@@ -480,6 +480,7 @@ export class CovidScPageHome extends LitElement {
     // var data1 = [{x:new Date(),y:100},{x:new Date(),y:100},{x:new Date(),y:100},{x:new Date(),y:100}];
     // var data2 = [100,200,100,200];
     const ctx = this.shadowRoot.getElementById('chart');
+    console.log(this.countyList);
     const config = {
       type: 'line',
       data: {
@@ -518,6 +519,9 @@ export class CovidScPageHome extends LitElement {
               minUnit: 'day',
               round: 'day',
               distribution: 'series',
+              displayFormats: {
+                month: 'M',
+              },
             },
           },
           y: {
