@@ -67,6 +67,29 @@ export class CovidScPageResources extends LitElement {
           margin: 0px 8px 4px 8px;
         }
 
+        .note-box {
+          border-radius: 4px;
+          background-color: var(--Background-Color-Light);
+          padding: 16px;
+          margin: 16px 16px 0;
+        }
+
+        .note-title {
+          font-size: 20px;
+          font-weight: bold;
+          margin-bottom: 8px;
+        }
+
+        .note-body {
+          font-size: 16px;
+          font-weight: normal;
+          margin-bottom: 10px;
+        }
+
+        .note-button {
+          max-width: 392px;
+        }
+
         .action-button {
           /* width: 200px; */
         }
@@ -239,6 +262,21 @@ export class CovidScPageResources extends LitElement {
           </div>
         </div>
         <div class="layout vertical self-stretch">
+          <div class="layout vertical note-box">
+            <div class="note-title">
+              Not sure where to start?
+            </div>
+            <div class="note-body">
+              Our chatbot can help find the resources that are right for you
+            </div>
+            <mwc-button
+              alt="Get started"
+              unelevated
+              label="GET STARTED"
+              class="note-button"
+              @click=${this.openLandbot}
+            ></mwc-button>
+          </div>
           <div class="layout vertical module-container">
             <div class="module-title">
               Learn more about COVID-19
@@ -317,6 +355,14 @@ export class CovidScPageResources extends LitElement {
     `;
   }
 
+  openLandbot() {
+    if (typeof window.LandbotPopup !== 'undefined') {
+      window.myLandbot.open();
+    } else {
+      this.loadAndLaunchLandbot();
+    }
+  }
+
   closeLandbot() {
     // let's disable the killing of the landbot in case someone wants to return to the window once opened
     if (!this.landbotOpened) {
@@ -348,19 +394,9 @@ export class CovidScPageResources extends LitElement {
       // eslint-disable-next-line no-undef
       window.myLandbot = new LandbotPopup({
         index: 'https://landbot.io/u/H-425846-85U6RSZFC8RLG2G0/index.html',
-      });
-
-      // Show a proactive message on landbot load
-      window.myLandbot.on('landbot-load', () => {
-        window.myLandbot.sendProactive({
-          message: 'Let me help you find the resources you need.',
-          author: 'CovidSC HelpBot',
-          avatar:
-            'https://storage.googleapis.com/media.helloumi.com/105897/channels/5S3N8WZWXWDJ91NU6KEF6WG7W1YY0SU5.png',
-          extra: {
-            hide_textbox: true,
-          },
-        });
+        launcherOptions: {
+          enable: false,
+        },
       });
 
       window.myLandbot.on('landbot-widget-open', () => {
