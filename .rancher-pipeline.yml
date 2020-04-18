@@ -25,7 +25,7 @@ stages:
       image: node:latest
       shellScript: |-
         cd deployment
-        ls -l /bin/bash
+        $SHELL --version
         sed -i "s/BRANCH/${CICD_GIT_BRANCH}/g" pr-dev-deployment.yaml
         sed -i "s/BUILD_NUM/build${CICD_EXECUTION_SEQUENCE}/g" pr-dev-deployment.yaml
         sed -i "/^ / s/_/-/" pr-dev-deployment.yaml
