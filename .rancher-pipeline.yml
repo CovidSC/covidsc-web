@@ -26,6 +26,8 @@ stages:
       shellScript: |-
         cd deployment
         $SHELL --version
+        CICD_GIT_BRANCH_LOWERCASE=$(echo "${CICD_GIT_BRANCH}" | sed "s/[A-Z]/\L&/g")
+        echo $CICD_GIT_BRANCH_LOWERCASE
         sed -i "s/BRANCH/${CICD_GIT_BRANCH}/g" pr-dev-deployment.yaml
         sed -i "s/BUILD_NUM/build${CICD_EXECUTION_SEQUENCE}/g" pr-dev-deployment.yaml
         sed -i "/^ / s/_/-/" pr-dev-deployment.yaml
