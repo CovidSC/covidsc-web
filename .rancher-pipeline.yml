@@ -25,12 +25,10 @@ stages:
       image: node:latest
       shellScript: |-
         cd deployment
-        CICD_GIT_BRANCH_LOWERCASE=$(echo "${CICD_GIT_BRANCH}" | sed "s/[A-Z]/\L&/g")
-        echo $CICD_GIT_BRANCH_LOWERCASE
-        sed -i "s/BRANCH/${CICD_GIT_BRANCH_LOWERCASE}/g" pr-dev-deployment.yaml
+        sed -i "s/BRANCH/$(echo ${CICD_GIT_BRANCH} | sed "s/[A-Z]/\L&/g")/g" pr-dev-deployment.yaml
         sed -i "s/BUILD_NUM/build${CICD_EXECUTION_SEQUENCE}/g" pr-dev-deployment.yaml
         sed -i "/^ / s/_/-/" pr-dev-deployment.yaml
-        sed -i "33 s|.*|        image: 127.0.0.1:34422/covidsc-web:${CICD_GIT_BRANCH_LOWERCASE}|" pr-dev-deployment.yaml
+        sed -i "33 s|.*|        image: 127.0.0.1:34422/covidsc-web:${CICD_GIT_BRANCH}|" pr-dev-deployment.yaml
   - applyYamlConfig:
       path: ./deployment/pr-dev-deployment.yaml
     when:
