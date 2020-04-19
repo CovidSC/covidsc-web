@@ -1,3 +1,6 @@
+/* eslint-env es6 */
+/* jshint esversion: 9 */
+
 import { createCompatibilityConfig } from '@open-wc/building-rollup';
 import copy from 'rollup-plugin-cpy';
 import { generateSW } from 'rollup-plugin-workbox';
