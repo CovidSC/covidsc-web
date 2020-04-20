@@ -339,6 +339,19 @@ export class CovidScPageHome extends LitElement {
               : ''}
           </div>
         </div>
+        <mwc-select
+          style="margin: 5px 0; padding: 0 16px; width: 100%; box-sizing: border-box; min-width: 288px; max-width: 392px;"
+          id="countymenu"
+          outlined
+          label="County"
+          @change=${this.changeSelectedCounty}
+        >
+          ${this.countyList.map(
+            item => html`
+              <mwc-list-item value="${item}">${item}</mwc-list-item>
+            `,
+          )}
+        </mwc-select>
         <div class="layout vertical module-container">
           <div class="module-title">
             Day-to-Day Confirmed Case Numbers
@@ -348,23 +361,6 @@ export class CovidScPageHome extends LitElement {
             </p>
           </div>
           <div class="layout vertical data-table module-content">
-            <mwc-select
-              style="margin: 5px 0; width 75%"
-              id="countymenu"
-              outlined
-              value="York"
-              label="County"
-              @change=${this.changeSelectedCounty}
-            >
-              ${this.getData()}
-              ${this.countyList.map(
-                item => html`
-                  <mwc-list-item value="${item}">${item}</mwc-list-item>
-                `,
-              )}
-              <mwc-list-item value="York">York</mwc-list-item>
-              <mwc-list-item value="Richland">Richland</mwc-list-item>
-            </mwc-select>
             <canvas id="chart" width="400" height="230"></canvas>
           </div>
           <div class="module-footer">
@@ -428,12 +424,10 @@ export class CovidScPageHome extends LitElement {
 
   // eslint-disable-next-line class-methods-use-this, no-unused-vars
   changeSelectedCounty(e) {
-    console.log(e);
     // change to e.target.selected
     this.selectedCounty = e.path[0].value;
     if (this.countyData && this.countyData[this.selectedCounty]) {
       this.chartData.countyData = this.countyData[this.selectedCounty];
-      console.log(this.selectedCounty, this.chartData.countyData);
       this.updateChart();
     }
   }
@@ -451,25 +445,13 @@ export class CovidScPageHome extends LitElement {
         fill: false,
         data: this.chartData.stateData,
       });
-      // re-enable this later
-      // this.myChart.data.datasets.push(
-      //   {
-      //     label: this.selectedCounty,
-      //     backgroundColor: primaryColor,
-      //     borderColor: primaryColor,
-      //     fill: false,
-      //     data: this.chartData.countyData,
-      //   }
-      // );
-      for (let i = 0; i < Object.keys(this.countyData).length; i += 1) {
-        this.myChart.data.datasets.push({
-          label: Object.keys(this.countyData)[i],
-          backgroundColor: primaryColor,
-          borderColor: primaryColor,
-          fill: false,
-          data: this.countyData[Object.keys(this.countyData)[i]],
-        });
-      }
+      this.myChart.data.datasets.push({
+        label: this.selectedCounty,
+        backgroundColor: primaryColor,
+        borderColor: primaryColor,
+        fill: false,
+        data: this.chartData.countyData,
+      });
       this.myChart.update();
     }
   }
@@ -480,7 +462,6 @@ export class CovidScPageHome extends LitElement {
     // var data1 = [{x:new Date(),y:100},{x:new Date(),y:100},{x:new Date(),y:100},{x:new Date(),y:100}];
     // var data2 = [100,200,100,200];
     const ctx = this.shadowRoot.getElementById('chart');
-    console.log(this.countyList);
     const config = {
       type: 'line',
       data: {
@@ -505,7 +486,12 @@ export class CovidScPageHome extends LitElement {
           displayColors: false,
         },
         legend: {
-          display: false,
+          display: true,
+          position: 'bottom',
+          align: 'start',
+          labels: {
+            boxWidth: 12,
+          },
         },
         responsive: true,
         title: {
@@ -520,7 +506,7 @@ export class CovidScPageHome extends LitElement {
               round: 'day',
               distribution: 'series',
               displayFormats: {
-                month: 'M',
+                day: 'M/d',
               },
             },
           },
@@ -532,24 +518,6 @@ export class CovidScPageHome extends LitElement {
     };
     this.myChart = new Chart(ctx, config);
     this.updateChart();
-    // let chart = new Chart(ctx, {
-    //   type: 'line',
-    //   data: {
-    //       datasets: [{
-    //           label: 'First dataset',
-    //           data: [0, 20, 40, 50]
-    //       }],
-    //       labels: ['January', 'February', 'March', 'April']
-    //   },
-    //   options: {
-    //       scales: {
-    //           y: {
-    //               suggestedMin: 50,
-    //               suggestedMax: 100
-    //           }
-    //       }
-    //   }
-    // });
   }
 
   getData() {
@@ -586,8 +554,6 @@ export class CovidScPageHome extends LitElement {
             // if I'm here, date failed to parse
             return false;
           }
-          // console.log(new Date(e.LastUpdate));
-          // if((new Date(e.LastUpdate))
           return true;
         });
 
@@ -612,7 +578,6 @@ export class CovidScPageHome extends LitElement {
 
             return accumulator;
           }, {});
-        // console.log(this.stateData);
         this.chartData.stateData = this.stateData.ALL;
 
         this.countyData = filteredData
@@ -635,39 +600,22 @@ export class CovidScPageHome extends LitElement {
             }
             return accumulator;
           }, {});
-        // console.log(this.countyData);
 
         // generate county list for dropdown
         this.countyList = Object.keys(this.countyData).reverse();
-        // console.log(this.countyList);
+        [this.selectedCounty] = this.countyList;
 
         this.chartData.countyData = this.countyData.York;
-        // console.log(this.chartData.countyData);
         this.initChart();
-
-        // // reverse the arrays for each object
-        // let arr1 = [];
-        // arr1 = Object.keys(res).map((k) => {
-        //   return res[k].reverse();
-        // });
-        // console.log(arr1);
-
-        // let arr = [];
-        // arr = Object.keys(res).map((k, index, array) => {
-        //   return res[k].reverse();
-        // });
-        // console.log(arr);
-
-        // convert this object to back to an array
-        // not needed right now
-        // let arr = Object.keys(res).map((k) => res[k]);
-        // console.log(arr);
+        this.requestUpdate();
+        setTimeout(() => {
+          this.shadowRoot.querySelector('#countymenu').select(0);
+        }, 0);
       });
 
     fetch(currents)
       .then(response => response.json())
       .then(data => {
-        // console.log(data);
         const strokeOpacity = 0.8;
 
         let HotCounties = [];
@@ -682,7 +630,6 @@ export class CovidScPageHome extends LitElement {
               Confirmed_POPADJ_GF: d.Confirmed_POPADJ_GF,
               Confirmed_POPADJ_GF_Change: d.Confirmed_POPADJ_GF_Change,
             });
-            // if (d.Deaths_Change != 0) { console.log(d.County + ' deaths up ' + d.Deaths_Change); }
             if (d.Confirmed > 0) {
               confirmedCircles[d.County] = {
                 center: { lat: d.Lat, lng: d.Long },
@@ -718,7 +665,6 @@ export class CovidScPageHome extends LitElement {
             if (d.Deaths_Change > 0)
               this.counts.state.deathsChanged = `+${this.counts.state.deathsChanged}`;
             this.counts.state.lastUpdate = new Date(d.LastUpdate).toLocaleDateString();
-            // console.log("State Counts", this.counts.state);
           }
 
           // this looks like the header counts for USA
@@ -734,7 +680,6 @@ export class CovidScPageHome extends LitElement {
             if (d.Deaths_Change > 0)
               this.counts.national.deathsChanged = `+${this.counts.national.deathsChanged}`;
             this.counts.national.lastUpdate = new Date(d.LastUpdate).toLocaleDateString();
-            // console.log("National Counts", this.counts.national);
           }
         });
         HotCounties = HotCounties.sort((a, b) => b.Confirmed_POPADJ_GF - a.Confirmed_POPADJ_GF); // sort descending
@@ -742,7 +687,6 @@ export class CovidScPageHome extends LitElement {
         for (let i = 0; i < HotCounties.length; i += 1) {
           const countyObj = HotCounties[i];
           if (countyObj.Confirmed_POPADJ_GF > 10) {
-            // console.log(c.County + ': ' + c.Confirmed_POPADJ_GF);
             countyObj.County += ' County';
             countyObj.Confirmed_POPADJ_GF = countyObj.Confirmed_POPADJ_GF.toFixed(2);
             countyObj.Confirmed_POPADJ_GF_Change = countyObj.Confirmed_POPADJ_GF_Change.toFixed(2);
@@ -753,7 +697,6 @@ export class CovidScPageHome extends LitElement {
           }
         }
         this.hotspots = { confirmedCircles, deathCircles };
-        // console.log(confirmedCircles);
         this.requestUpdate();
       });
   }
