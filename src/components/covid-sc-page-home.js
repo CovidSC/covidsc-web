@@ -478,11 +478,12 @@ export class CovidScPageHome extends LitElement {
           }
         });
         // push each of the top 3 counties to the chart's datasets
+        const colors = ['#B0335C', primaryColor, '#FFA8C5'];
         for (let i = 0; i < top3counties.length; i += 1) {
           this.myChart.data.datasets.push({
             label: top3counties[i].name,
-            backgroundColor: primaryColor,
-            borderColor: primaryColor,
+            backgroundColor: colors[i],
+            borderColor: colors[i],
             fill: false,
             data: this.countyData[top3counties[i].name],
           });
