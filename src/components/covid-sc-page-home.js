@@ -349,6 +349,7 @@ export class CovidScPageHome extends LitElement {
           </div>
         </div>
         <mwc-select id="countymenu" outlined label="County" @change=${this.changeSelectedCounty}>
+          <mwc-list-item value="top3" selected>Top 3 (by total cases)</mwc-list-item>
           ${this.countyList.map(
             item => html`
               <mwc-list-item value="${item}">${item}</mwc-list-item>
@@ -428,8 +429,10 @@ export class CovidScPageHome extends LitElement {
   // eslint-disable-next-line class-methods-use-this, no-unused-vars
   changeSelectedCounty(e) {
     // change to e.target.selected
-    this.selectedCounty = e.path[0].value;
-    if (this.countyData && this.countyData[this.selectedCounty]) {
+    this.selectedCounty = e.target.selected.value;
+    if (this.selectedCounty === 'top3') {
+      this.updateChart();
+    } else if (this.countyData && this.countyData[this.selectedCounty]) {
       this.chartData.countyData = this.countyData[this.selectedCounty];
       this.updateChart();
     }
@@ -439,8 +442,7 @@ export class CovidScPageHome extends LitElement {
     const primaryColor = getComputedStyle(this).getPropertyValue('--Primary-Action-Color');
     const secondaryColor = getComputedStyle(this).getPropertyValue('--Theme-Color');
     if (this.myChart) {
-      this.myChart.data.datasets.pop();
-      this.myChart.data.datasets.pop();
+      this.myChart.data.datasets = [];
       this.myChart.data.datasets.push({
         label: 'South Carolina',
         backgroundColor: secondaryColor,
@@ -448,13 +450,52 @@ export class CovidScPageHome extends LitElement {
         fill: false,
         data: this.chartData.stateData,
       });
-      this.myChart.data.datasets.push({
-        label: this.selectedCounty,
-        backgroundColor: primaryColor,
-        borderColor: primaryColor,
-        fill: false,
-        data: this.chartData.countyData,
-      });
+      if (this.selectedCounty === 'top3') {
+        const top3counties = [];
+        // for each county
+        const counties = Object.keys(this.countyData);
+        counties.forEach(county => {
+          const countyDataListLength = this.countyData[county].length;
+          const countyNumCases = this.countyData[county][countyDataListLength - 1].y;
+          let countyAdded = false;
+          for (let i = 0; i < top3counties.length; i += 1) {
+            // if the current county has more cases than a candidate
+            if (countyNumCases > top3counties[i].numCases) {
+              // add the current county before that candidate
+              top3counties.splice(i, 0, { name: county, numCases: countyNumCases });
+              countyAdded = true;
+              break;
+            }
+          }
+          // if a candidate was added and there are now more than 3 candidates
+          if (countyAdded && top3counties.length > 3) {
+            // remove the last candidate
+            top3counties.splice(3, 1);
+          }
+          // if no candidate was added and the length is still less than 3, push the current county as a candidate
+          else if (!countyAdded && top3counties.length < 3) {
+            top3counties.push({ name: county, numCases: countyNumCases });
+          }
+        });
+        // push each of the top 3 counties to the chart's datasets
+        for (let i = 0; i < top3counties.length; i += 1) {
+          this.myChart.data.datasets.push({
+            label: top3counties[i].name,
+            backgroundColor: primaryColor,
+            borderColor: primaryColor,
+            fill: false,
+            data: this.countyData[top3counties[i].name],
+          });
+        }
+      } else {
+        this.myChart.data.datasets.push({
+          label: this.selectedCounty,
+          backgroundColor: primaryColor,
+          borderColor: primaryColor,
+          fill: false,
+          data: this.chartData.countyData,
+        });
+      }
       this.myChart.update();
     }
   }
@@ -606,14 +647,9 @@ export class CovidScPageHome extends LitElement {
 
         // generate county list for dropdown
         this.countyList = Object.keys(this.countyData).reverse();
-        [this.selectedCounty] = this.countyList;
-
-        this.chartData.countyData = this.countyData.York;
+        this.selectedCounty = 'top3';
         this.initChart();
         this.requestUpdate();
-        setTimeout(() => {
-          this.shadowRoot.querySelector('#countymenu').select(0);
-        }, 0);
       });
 
     fetch(currents)
