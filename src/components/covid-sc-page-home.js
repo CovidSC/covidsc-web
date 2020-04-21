@@ -8,7 +8,7 @@ import '@material/mwc-button';
 import '@material/mwc-select';
 import '@material/mwc-menu';
 import '@material/mwc-list/mwc-list-item';
-import Chart from 'chart.js';
+import Chart from '../scripts/chart.esm.js';
 // import 'luxon';
 import './chartjs-adapter-luxon.js';
 import { IronFlex, IronFlexAlignment } from './flex-styles.js';
@@ -226,6 +226,15 @@ export class CovidScPageHome extends LitElement {
           height: 200px;
           overflow-y: scroll;
         }
+        #countymenu {
+          font-size: 12px;
+          margin: 5px 0;
+          padding: 0 16px;
+          width: 100%;
+          box-sizing: border-box;
+          min-width: 288px;
+          max-width: 392px;
+        }
       `,
     ];
   }
@@ -339,6 +348,14 @@ export class CovidScPageHome extends LitElement {
               : ''}
           </div>
         </div>
+        <mwc-select id="countymenu" outlined label="County" @change=${this.changeSelectedCounty}>
+          <mwc-list-item value="top3" selected>Top 3 (by total cases)</mwc-list-item>
+          ${this.countyList.map(
+            item => html`
+              <mwc-list-item value="${item}">${item}</mwc-list-item>
+            `,
+          )}
+        </mwc-select>
         <div class="layout vertical module-container">
           <div class="module-title">
             Day-to-Day Confirmed Case Numbers
@@ -348,23 +365,6 @@ export class CovidScPageHome extends LitElement {
             </p>
           </div>
           <div class="layout vertical data-table module-content">
-            <mwc-select
-              hidden
-              style="display:none;"
-              id="countymenu"
-              outlined
-              value="York"
-              label="County"
-              @change=${this.changeSelectedCounty}
-            >
-              ${this.countyList.map(
-                item => html`
-                  <mwc-list-item value="${item}">${item}</mwc-list-item>
-                `,
-              )}
-              <mwc-list-item value="York">York</mwc-list-item>
-              <mwc-list-item value="Richland">Richland</mwc-list-item>
-            </mwc-select>
             <canvas id="chart" width="400" height="230"></canvas>
           </div>
           <div class="module-footer">
@@ -428,22 +428,21 @@ export class CovidScPageHome extends LitElement {
 
   // eslint-disable-next-line class-methods-use-this, no-unused-vars
   changeSelectedCounty(e) {
-    // console.log(e);
     // change to e.target.selected
-    // this.selectedCounty = e.path[0].value;
-    // if (this.countyData && this.countyData[this.selectedCounty]) {
-    //   this.chartData.countyData = this.countyData[this.selectedCounty];
-    //   // console.log(this.selectedCounty,this.chartData.countyData);
-    //   this.updateChart();
-    // }
+    this.selectedCounty = e.target.selected.value;
+    if (this.selectedCounty === 'top3') {
+      this.updateChart();
+    } else if (this.countyData && this.countyData[this.selectedCounty]) {
+      this.chartData.countyData = this.countyData[this.selectedCounty];
+      this.updateChart();
+    }
   }
 
   updateChart() {
     const primaryColor = getComputedStyle(this).getPropertyValue('--Primary-Action-Color');
     const secondaryColor = getComputedStyle(this).getPropertyValue('--Theme-Color');
     if (this.myChart) {
-      this.myChart.data.datasets.pop();
-      this.myChart.data.datasets.pop();
+      this.myChart.data.datasets = [];
       this.myChart.data.datasets.push({
         label: 'South Carolina',
         backgroundColor: secondaryColor,
@@ -451,23 +450,51 @@ export class CovidScPageHome extends LitElement {
         fill: false,
         data: this.chartData.stateData,
       });
-      // re-enable this later
-      // this.myChart.data.datasets.push(
-      //   {
-      //     label: this.selectedCounty,
-      //     backgroundColor: primaryColor,
-      //     borderColor: primaryColor,
-      //     fill: false,
-      //     data: this.chartData.countyData,
-      //   }
-      // );
-      for (let i = 0; i < Object.keys(this.countyData).length; i += 1) {
+      if (this.selectedCounty === 'top3') {
+        const top3counties = [];
+        // for each county
+        const counties = Object.keys(this.countyData);
+        counties.forEach(county => {
+          const countyDataListLength = this.countyData[county].length;
+          const countyNumCases = this.countyData[county][countyDataListLength - 1].y;
+          let countyAdded = false;
+          for (let i = 0; i < top3counties.length; i += 1) {
+            // if the current county has more cases than a candidate
+            if (countyNumCases > top3counties[i].numCases) {
+              // add the current county before that candidate
+              top3counties.splice(i, 0, { name: county, numCases: countyNumCases });
+              countyAdded = true;
+              break;
+            }
+          }
+          // if a candidate was added and there are now more than 3 candidates
+          if (countyAdded && top3counties.length > 3) {
+            // remove the last candidate
+            top3counties.splice(3, 1);
+          }
+          // if no candidate was added and the length is still less than 3, push the current county as a candidate
+          else if (!countyAdded && top3counties.length < 3) {
+            top3counties.push({ name: county, numCases: countyNumCases });
+          }
+        });
+        // push each of the top 3 counties to the chart's datasets
+        const colors = ['#B0335C', primaryColor, '#FFA8C5'];
+        for (let i = 0; i < top3counties.length; i += 1) {
+          this.myChart.data.datasets.push({
+            label: top3counties[i].name,
+            backgroundColor: colors[i],
+            borderColor: colors[i],
+            fill: false,
+            data: this.countyData[top3counties[i].name],
+          });
+        }
+      } else {
         this.myChart.data.datasets.push({
-          label: Object.keys(this.countyData)[i],
+          label: this.selectedCounty,
           backgroundColor: primaryColor,
           borderColor: primaryColor,
           fill: false,
-          data: this.countyData[Object.keys(this.countyData)[i]],
+          data: this.chartData.countyData,
         });
       }
       this.myChart.update();
@@ -479,17 +506,37 @@ export class CovidScPageHome extends LitElement {
     // var data2 = [100,200,100,200];
     // var data1 = [{x:new Date(),y:100},{x:new Date(),y:100},{x:new Date(),y:100},{x:new Date(),y:100}];
     // var data2 = [100,200,100,200];
-
     const ctx = this.shadowRoot.getElementById('chart');
     const config = {
       type: 'line',
       data: {
         datasets: [],
-        // labels: ['12/1', '12/2', '12/3', '12/4']
       },
       options: {
+        tooltips: {
+          enable: true,
+          enabled: true,
+          display: true,
+          callbacks: {
+            title(tooltipItem) {
+              const split = tooltipItem[0].label.split(',');
+              return `${split[0]},${split[1]}`;
+            },
+          },
+          backgroundColor: '#FFF',
+          titleFontSize: 16,
+          titleFontColor: '#0066ff',
+          bodyFontColor: '#000',
+          bodyFontSize: 14,
+          displayColors: false,
+        },
         legend: {
-          display: false,
+          display: true,
+          position: 'bottom',
+          align: 'start',
+          labels: {
+            boxWidth: 12,
+          },
         },
         responsive: true,
         title: {
@@ -500,9 +547,12 @@ export class CovidScPageHome extends LitElement {
             type: 'time',
             time: {
               unit: 'day',
-              // minUnit: 'day',
+              minUnit: 'day',
               round: 'day',
               distribution: 'series',
+              displayFormats: {
+                day: 'M/d',
+              },
             },
           },
           y: {
@@ -513,24 +563,6 @@ export class CovidScPageHome extends LitElement {
     };
     this.myChart = new Chart(ctx, config);
     this.updateChart();
-    // let chart = new Chart(ctx, {
-    //   type: 'line',
-    //   data: {
-    //       datasets: [{
-    //           label: 'First dataset',
-    //           data: [0, 20, 40, 50]
-    //       }],
-    //       labels: ['January', 'February', 'March', 'April']
-    //   },
-    //   options: {
-    //       scales: {
-    //           y: {
-    //               suggestedMin: 50,
-    //               suggestedMax: 100
-    //           }
-    //       }
-    //   }
-    // });
   }
 
   getData() {
@@ -567,8 +599,6 @@ export class CovidScPageHome extends LitElement {
             // if I'm here, date failed to parse
             return false;
           }
-          // console.log(new Date(e.LastUpdate));
-          // if((new Date(e.LastUpdate))
           return true;
         });
 
@@ -593,7 +623,6 @@ export class CovidScPageHome extends LitElement {
 
             return accumulator;
           }, {});
-        // console.log(this.stateData);
         this.chartData.stateData = this.stateData.ALL;
 
         this.countyData = filteredData
@@ -616,39 +645,17 @@ export class CovidScPageHome extends LitElement {
             }
             return accumulator;
           }, {});
-        // console.log(this.countyData);
 
         // generate county list for dropdown
         this.countyList = Object.keys(this.countyData).reverse();
-        // console.log(this.countyList);
-
-        this.chartData.countyData = this.countyData.York;
-        // console.log(this.chartData.countyData);
+        this.selectedCounty = 'top3';
         this.initChart();
-
-        // // reverse the arrays for each object
-        // let arr1 = [];
-        // arr1 = Object.keys(res).map((k) => {
-        //   return res[k].reverse();
-        // });
-        // console.log(arr1);
-
-        // let arr = [];
-        // arr = Object.keys(res).map((k, index, array) => {
-        //   return res[k].reverse();
-        // });
-        // console.log(arr);
-
-        // convert this object to back to an array
-        // not needed right now
-        // let arr = Object.keys(res).map((k) => res[k]);
-        // console.log(arr);
+        this.requestUpdate();
       });
 
     fetch(currents)
       .then(response => response.json())
       .then(data => {
-        // console.log(data);
         const strokeOpacity = 0.8;
 
         let HotCounties = [];
@@ -663,7 +670,6 @@ export class CovidScPageHome extends LitElement {
               Confirmed_POPADJ_GF: d.Confirmed_POPADJ_GF,
               Confirmed_POPADJ_GF_Change: d.Confirmed_POPADJ_GF_Change,
             });
-            // if (d.Deaths_Change != 0) { console.log(d.County + ' deaths up ' + d.Deaths_Change); }
             if (d.Confirmed > 0) {
               confirmedCircles[d.County] = {
                 center: { lat: d.Lat, lng: d.Long },
@@ -699,7 +705,6 @@ export class CovidScPageHome extends LitElement {
             if (d.Deaths_Change > 0)
               this.counts.state.deathsChanged = `+${this.counts.state.deathsChanged}`;
             this.counts.state.lastUpdate = new Date(d.LastUpdate).toLocaleDateString();
-            // console.log("State Counts", this.counts.state);
           }
 
           // this looks like the header counts for USA
@@ -715,7 +720,6 @@ export class CovidScPageHome extends LitElement {
             if (d.Deaths_Change > 0)
               this.counts.national.deathsChanged = `+${this.counts.national.deathsChanged}`;
             this.counts.national.lastUpdate = new Date(d.LastUpdate).toLocaleDateString();
-            // console.log("National Counts", this.counts.national);
           }
         });
         HotCounties = HotCounties.sort((a, b) => b.Confirmed_POPADJ_GF - a.Confirmed_POPADJ_GF); // sort descending
@@ -723,7 +727,6 @@ export class CovidScPageHome extends LitElement {
         for (let i = 0; i < HotCounties.length; i += 1) {
           const countyObj = HotCounties[i];
           if (countyObj.Confirmed_POPADJ_GF > 10) {
-            // console.log(c.County + ': ' + c.Confirmed_POPADJ_GF);
             countyObj.County += ' County';
             countyObj.Confirmed_POPADJ_GF = countyObj.Confirmed_POPADJ_GF.toFixed(2);
             countyObj.Confirmed_POPADJ_GF_Change = countyObj.Confirmed_POPADJ_GF_Change.toFixed(2);
@@ -734,7 +737,6 @@ export class CovidScPageHome extends LitElement {
           }
         }
         this.hotspots = { confirmedCircles, deathCircles };
-        // console.log(confirmedCircles);
         this.requestUpdate();
       });
   }

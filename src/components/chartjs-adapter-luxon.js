@@ -1,4 +1,4 @@
-import Chart from 'chart.js';
+import Chart from '../scripts/chart.esm.js';
 import { DateTime } from 'luxon';
 
 const FORMATS = {
