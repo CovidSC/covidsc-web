@@ -226,6 +226,15 @@ export class CovidScPageHome extends LitElement {
           height: 200px;
           overflow-y: scroll;
         }
+        #countymenu {
+          font-size: 12px;
+          margin: 5px 0;
+          padding: 0 16px;
+          width: 100%;
+          box-sizing: border-box;
+          min-width: 288px;
+          max-width: 392px;
+        }
       `,
     ];
   }
@@ -339,13 +348,7 @@ export class CovidScPageHome extends LitElement {
               : ''}
           </div>
         </div>
-        <mwc-select
-          style="margin: 5px 0; padding: 0 16px; width: 100%; box-sizing: border-box; min-width: 288px; max-width: 392px;"
-          id="countymenu"
-          outlined
-          label="County"
-          @change=${this.changeSelectedCounty}
-        >
+        <mwc-select id="countymenu" outlined label="County" @change=${this.changeSelectedCounty}>
           ${this.countyList.map(
             item => html`
               <mwc-list-item value="${item}">${item}</mwc-list-item>
