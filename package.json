@@ -67,7 +67,7 @@
     "lit-element": "^2.0.1",
     "lit-html": "^1.0.0",
     "luxon": "^1.22.2",
-    "moment": "^2.24.0",
+    "moment": "^2.29.2",
     "pwa-helpers": "^0.9.1"
   }
 }
